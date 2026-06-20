@@ -34,7 +34,7 @@ gem "bootsnap",        "~> 1.23", require: false
 gem "kamal",           "~> 2.11", require: false
 gem "thruster",        "~> 0.1",  require: false
 gem "image_processing", "~> 1.2"
-gem "heroicons",        "~> 1.0", require: "heroicon"
+gem "heroicons",        "~> 2.2", require: "heroicon"
 
 # Active Storage attachment validations (content_type, size)
 gem "active_storage_validations", "~> 3.0"
