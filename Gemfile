@@ -40,7 +40,7 @@ gem "heroicons",        "~> 1.0", require: "heroicon"
 gem "active_storage_validations", "~> 3.0"
 
 # Zip archive of a request's attachments (admin download)
-gem "rubyzip", "~> 3.0", require: "zip"
+gem "rubyzip", "~> 3.3", require: "zip"
 
 # Payments — Stripe API client (signed webhooks, payment intents)
 gem "stripe", "~> 15.0"
