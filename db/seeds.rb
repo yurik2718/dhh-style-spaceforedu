@@ -2,6 +2,29 @@
 # Fresh database assumed: bin/rails db:schema:load db:seed
 
 # ─────────────────────────────────────────────────────────────
+# Production: only ensure the super admin exists — payment
+# confirmation and admin notifications depend on this account.
+# Demo data below must never reach production (weak passwords).
+# ─────────────────────────────────────────────────────────────
+
+if Rails.env.production?
+  email    = ENV["ADMIN_EMAIL"]
+  password = ENV["ADMIN_PASSWORD"]
+  abort "Set ADMIN_EMAIL and ADMIN_PASSWORD to seed the production super admin." if email.to_s.empty? || password.to_s.empty?
+
+  User.find_or_create_by!(email_address: email) do |u|
+    u.name                = ENV.fetch("ADMIN_NAME", "Admin")
+    u.role                = "super_admin"
+    u.locale              = "es"
+    u.country             = "ES"
+    u.privacy_accepted_at = Time.current
+    u.password            = password
+  end
+  puts "Super admin ensured: #{email}"
+  return
+end
+
+# ─────────────────────────────────────────────────────────────
 # Admin
 # ─────────────────────────────────────────────────────────────
 

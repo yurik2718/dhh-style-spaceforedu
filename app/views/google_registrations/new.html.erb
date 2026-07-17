@@ -1,0 +1,25 @@
+<% content_for :title, t("google_auth.consent_title") %>
+
+<h1 class="font-display font-bold text-4xl text-ink leading-[1.1] tracking-tight">
+  <%= t("google_auth.consent_title") %>
+</h1>
+<p class="text-sm text-mute mt-2"><%= t("google_auth.consent_hint", email: @user.email_address) %></p>
+
+<%= form_with model: @user, url: google_registration_path, class: "space-y-5 mt-6" do |f| %>
+  <% if @user.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside text-sm space-y-0.5">
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <label class="flex items-start gap-3 cursor-pointer text-sm text-body">
+    <%= f.check_box :privacy_accepted, { class: "checkbox mt-0.5 shrink-0" }, "1", "0" %>
+    <span><%= t("registrations.privacy_accept_html", url: privacy_path) %></span>
+  </label>
+
+  <%= f.submit t("google_auth.consent_submit"), class: "btn btn-primary w-full h-12 text-base" %>
+<% end %>

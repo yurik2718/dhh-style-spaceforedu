@@ -42,6 +42,19 @@ module Authentication
       session.delete(:return_to_after_authenticating) || root_url
     end
 
+    # Password (or OAuth) checked out — either open the session or, for
+    # 2FA-protected accounts, park the login behind a TOTP challenge.
+    def complete_authentication_for(user)
+      if user.otp_required?
+        session[:pending_otp_user_id]  = user.id
+        session[:pending_otp_deadline] = 5.minutes.from_now.iso8601
+        redirect_to new_two_factor_challenge_path
+      else
+        start_new_session_for user
+        redirect_to after_authentication_url
+      end
+    end
+
     def start_new_session_for(user)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session

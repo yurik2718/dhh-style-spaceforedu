@@ -25,3 +25,15 @@ production:
   cleanup_old_stripe_events:
     class: StripeEventCleanupJob
     schedule: every month at 5am UTC on the 1st
+
+  purge_expired_requests:
+    class: RequestRetentionJob
+    schedule: every month at 6am UTC on the 1st
+
+  backup_databases:
+    class: DatabaseBackupJob
+    schedule: every day at 2am UTC
+
+  admin_weekly_digest:
+    class: AdminDigestJob
+    schedule: every monday at 7am UTC

@@ -1,0 +1,9 @@
+<%= @error_class %> (<%= @severity %><%= " · #{@source}" if @source.present? %>)
+
+<%= @message %>
+
+Context: <%= @context %>
+
+<% @backtrace.each do |line| -%>
+  <%= line %>
+<% end -%>

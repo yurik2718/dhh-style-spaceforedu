@@ -17,7 +17,8 @@
       "Bash(bin/brakeman --no-pager -i config/brakeman.ignore)",
       "Bash(echo \"brakeman exit: $?\")",
       "Bash(RAILS_MASTER_KEY= bin/rails runner 'puts \"before: #{Rails.application.credentials.config.inspect}\"; Rails.application.credentials.config.deep_merge!\\(stripe: { webhook_secret: \"whsec_test_only\" }\\); puts \"after: #{Rails.application.credentials.config.inspect}\"; puts \"dig: #{Rails.application.credentials.dig\\(:stripe, :webhook_secret\\)}\"')",
-      "Bash(gh run *)"
+      "Bash(gh run *)",
+      "Bash(mise exec *)"
     ]
   }
 }

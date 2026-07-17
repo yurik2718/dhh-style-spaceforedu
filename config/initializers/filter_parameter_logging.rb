@@ -8,5 +8,7 @@ Rails.application.config.filter_parameters += [
   # PII fields — GDPR
   :phone, :whatsapp, :guardian_phone, :guardian_whatsapp, :guardian_email,
   :telegram_chat_id, :guardian_name,
-  :identity_card, :passport, :birthday, :name
+  :identity_card, :passport, :birthday, :name,
+  # Free-text fields — chat and request content routinely carry PII
+  :body, :description, :subject, :university, :pipeline_notes, :country
 ]

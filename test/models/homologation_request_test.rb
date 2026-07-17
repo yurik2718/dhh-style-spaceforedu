@@ -110,6 +110,28 @@ class HomologationRequestTest < ActiveSupport::TestCase
     end
   end
 
+  test "pipeline cannot move before payment is confirmed" do
+    unpaid = homologation_requests(:awaiting_payment)
+
+    assert_raises(HomologationRequest::InvalidTransition) do
+      unpaid.advance_pipeline!(changed_by: @admin)
+    end
+    assert_raises(HomologationRequest::InvalidTransition) do
+      unpaid.retreat_pipeline!(changed_by: @admin, reason: "wrong stage")
+    end
+  end
+
+  test "pipeline cannot move on a terminal request" do
+    @request.update_column(:status, "closed")
+
+    assert_raises(HomologationRequest::InvalidTransition) do
+      @request.advance_pipeline!(changed_by: @admin)
+    end
+    assert_raises(HomologationRequest::InvalidTransition) do
+      @request.retreat_pipeline!(changed_by: @admin, reason: "reopening")
+    end
+  end
+
   test "advance_pipeline! at completado raises InvalidTransition" do
     finished = homologation_requests(:at_completado)
 

@@ -51,8 +51,25 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  test "password must be at least 8 characters" do
+    user = User.new(email_address: "short@example.com", name: "Shorty", password: "seven77")
+
+    refute user.valid?
+    assert user.errors.added?(:password, :too_short, count: 8)
+
+    user.password = user.password_confirmation = "eight888"
+    assert user.valid?
+  end
+
+  test "updating a user without touching the password stays valid" do
+    user = users(:student_es)
+    user.name = "Renamed"
+
+    assert user.valid?
+  end
+
   test "email_address validates uniqueness regardless of case" do
-    invalid = User.new(email_address: "ADMIN@example.com", password: "secret", name: "Dup")
+    invalid = User.new(email_address: "ADMIN@example.com", password: "secret42", name: "Dup")
 
     refute invalid.valid?
     assert invalid.errors.added?(:email_address, :taken, value: "admin@example.com")
@@ -61,7 +78,7 @@ class UserTest < ActiveSupport::TestCase
   test "phone is stored encrypted at rest" do
     user = User.create!(
       email_address: "enc@example.com",
-      password:      "secret",
+      password:      "secret42",
       name:          "Enc",
       phone:         "+34000000000"
     )
@@ -76,7 +93,7 @@ class UserTest < ActiveSupport::TestCase
   test "identity_card is stored encrypted at rest" do
     user = User.create!(
       email_address: "id@example.com",
-      password:      "secret",
+      password:      "secret42",
       name:          "Id",
       identity_card: "12345678A"
     )
@@ -91,7 +108,7 @@ class UserTest < ActiveSupport::TestCase
   test "passport is stored encrypted at rest" do
     user = User.create!(
       email_address: "pp@example.com",
-      password:      "secret",
+      password:      "secret42",
       name:          "Pp",
       passport:      "AB1234567"
     )

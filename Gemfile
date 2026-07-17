@@ -9,6 +9,10 @@ gem "turbo-rails",       "~> 2.0"
 gem "stimulus-rails",    "~> 1.3"
 gem "tailwindcss-rails", "~> 4.4"
 gem "bcrypt",            "~> 3.1"
+gem "omniauth-google-oauth2",         "~> 1.2"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "rotp",    "~> 6.3"
+gem "rqrcode", "~> 3.0"
 
 # Authorization
 gem "pundit", "~> 2.5"

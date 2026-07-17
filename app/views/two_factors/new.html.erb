@@ -1,0 +1,36 @@
+<% content_for :title, t("two_factor.setup_title") %>
+
+<%= render "shared/page_header", title: t("two_factor.setup_title") %>
+
+<div class="max-w-lg space-y-6">
+  <div class="card bg-canvas border border-hairline-soft">
+    <div class="card-body space-y-4" style="--card-body-pad: 1.5rem">
+      <p class="text-sm text-body"><%= t("two_factor.setup_step_scan") %></p>
+
+      <div class="w-48 h-48 mx-auto [&_svg]:w-full [&_svg]:h-full bg-white rounded-xl p-2">
+        <%= @qr_svg.html_safe %>
+      </div>
+
+      <p class="text-xs text-mute text-center">
+        <%= t("two_factor.setup_manual_secret") %>
+        <code class="select-all font-mono text-ink"><%= @secret %></code>
+      </p>
+
+      <hr class="border-hairline-soft">
+
+      <%= form_with url: two_factor_path, class: "space-y-4" do |f| %>
+        <div>
+          <label class="label" for="<%= f.field_id(:code) %>"><%= t("two_factor.setup_step_confirm") %></label>
+          <%= f.text_field :code,
+                required: true,
+                autocomplete: "one-time-code",
+                inputmode: "numeric",
+                maxlength: 10,
+                placeholder: "123 456",
+                class: "input w-full" %>
+        </div>
+        <%= f.submit t("two_factor.setup_submit"), class: "btn btn-primary w-full" %>
+      <% end %>
+    </div>
+  </div>
+</div>

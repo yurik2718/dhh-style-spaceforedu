@@ -4,6 +4,7 @@ class RequestDocument < ApplicationRecord
 
   belongs_to :homologation_request, inverse_of: :request_documents
   has_one_attached :file
+  has_many :document_accesses, dependent: :delete_all
 
   validates :kind, inclusion: { in: KINDS }, uniqueness: { scope: :homologation_request_id }
   validates :file, attached: true,
@@ -13,6 +14,10 @@ class RequestDocument < ApplicationRecord
   scope :required, -> { where(kind: REQUIRED_KINDS) }
 
   def required? = REQUIRED_KINDS.include?(kind)
+
+  def record_access!(by:, via:)
+    document_accesses.create!(user: by, via: via)
+  end
 
   # The browser saves this as Content-Disposition's filename. Predictable
   # across students so admin can pile downloads into one folder without

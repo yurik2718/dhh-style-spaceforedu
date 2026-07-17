@@ -1,0 +1,17 @@
+<% if @stale.any? -%>
+<%= t("admin_digest.stale_heading", count: @stale.size) %>
+
+<% @stale.each do |request| -%>
+- <%= request.user.name %> — <%= request.subject %> (<%= request.pipeline_stage %>, <%= t("admin_digest.days_idle", count: ((Time.current - request.pipeline_changed_at) / 1.day).floor) %>)
+<% end -%>
+
+<% end -%>
+<% if @inbox.any? -%>
+<%= t("admin_digest.inbox_heading", count: @inbox.size) %>
+
+<% @inbox.each do |request| -%>
+- <%= request.user.name %> — <%= request.subject %> (<%= t("requests.status.#{request.status}", default: request.status) %>)
+<% end -%>
+
+<% end -%>
+<%= t("admin_digest.footer_url", url: admin_pipeline_url) %>

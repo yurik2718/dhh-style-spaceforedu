@@ -38,6 +38,7 @@
     <%= f.password_field :password,
           required: true,
           autocomplete: "new-password",
+          minlength: 8,
           maxlength: 72,
           placeholder: "••••••••",
           class: "input w-full" %>
@@ -48,6 +49,7 @@
     <%= f.password_field :password_confirmation,
           required: true,
           autocomplete: "new-password",
+          minlength: 8,
           maxlength: 72,
           placeholder: "••••••••",
           class: "input w-full" %>
@@ -68,6 +70,8 @@
     </p>
   </div>
 <% end %>
+
+<%= render "shared/google_sign_in" %>
 
 <div class="divider"><%= t("auth.or") %></div>
 
