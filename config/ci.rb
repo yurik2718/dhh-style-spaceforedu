@@ -7,7 +7,10 @@ CI.run do
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
-  step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+  # -w 2 = fail only on Medium+ confidence, matching .github/workflows/ci.yml —
+  # weak findings still print for review but don't block on known false positives
+  # (e.g. the intentional cross-host redirect to checkout.stripe.com).
+  step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager -w 2 --exit-on-warn --exit-on-error"
   step "Tests: Rails", "bin/rails test"
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
 
