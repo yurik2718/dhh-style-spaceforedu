@@ -107,6 +107,58 @@ class HomologationRequestDocumentsControllerTest < ActionDispatch::IntegrationTe
     assert_redirected_to homologation_request_path(@draft)
   end
 
+  test "GET show streams the file to the request owner, even in a locked status" do
+    sign_in_as @student
+    doc = attach_request_document(@draft, kind: "passport", content: "%PDF-1.4 passport")
+    @draft.update_column(:status, "submitted")
+
+    get homologation_request_document_path(@draft, doc.id)
+
+    assert_response :ok
+    assert_equal "%PDF-1.4 passport", response.body
+    assert_match(/attachment/, response.headers["Content-Disposition"])
+    assert_match(/passport_/, response.headers["Content-Disposition"])
+  end
+
+  test "GET show streams the file to the admin" do
+    sign_in_as users(:admin)
+    doc = attach_request_document(@draft, kind: "diploma")
+
+    get homologation_request_document_path(@draft, doc.id)
+
+    assert_response :ok
+  end
+
+  test "GET show leaves an audit trail of who downloaded the document" do
+    sign_in_as users(:admin)
+    doc = attach_request_document(@draft, kind: "passport")
+
+    assert_difference -> { DocumentAccess.count }, 1 do
+      get homologation_request_document_path(@draft, doc.id)
+    end
+
+    access = DocumentAccess.last
+    assert_equal users(:admin), access.user
+    assert_equal "download",    access.via
+  end
+
+  test "GET show refuses another student's document" do
+    sign_in_as users(:student_other)
+    doc = attach_request_document(@draft, kind: "passport")
+
+    get homologation_request_document_path(@draft, doc.id)
+
+    assert_redirected_to root_path
+  end
+
+  test "GET show requires authentication" do
+    doc = attach_request_document(@draft, kind: "passport")
+
+    get homologation_request_document_path(@draft, doc.id)
+
+    assert_redirected_to new_session_path
+  end
+
   test "non-editable status blocks uploads" do
     sign_in_as @student
     submitted = @student.homologation_requests.create!(

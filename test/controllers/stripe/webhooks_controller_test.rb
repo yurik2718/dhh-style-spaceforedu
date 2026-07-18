@@ -115,6 +115,28 @@ module Stripe
                    "duplicate event must not overwrite payment_confirmed_at"
     end
 
+    test "payment_intent.payment_failed also tells the student so they can retry" do
+      request = homologation_requests(:awaiting_payment)
+      student = request.user
+
+      assert_difference -> { student.notifications.where(notifiable: request).count }, 1 do
+        post_signed_event event_payload(id: "evt_pi_failed_student", type: "payment_intent.payment_failed", request_id: request.id)
+      end
+
+      assert_response :ok
+    end
+
+    test "payment_intent.succeeded without a super admin returns 500 and forgets the event so Stripe retries it" do
+      User.where(role: "super_admin").update_all(role: "student")
+      request = homologation_requests(:awaiting_payment)
+
+      post_signed_event event_payload(id: "evt_no_admin", type: "payment_intent.succeeded", request_id: request.id)
+
+      assert_response :internal_server_error
+      assert_not StripeEvent.exists?("evt_no_admin"), "event must be forgotten so the Stripe retry is processed fresh"
+      assert_equal "awaiting_payment", request.reload.status
+    end
+
     test "delayed succeeded webhook is idempotent and does not reset pipeline_stage" do
       request = homologation_requests(:awaiting_payment)
       admin   = users(:admin)

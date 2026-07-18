@@ -3,6 +3,12 @@ Rails.application.routes.draw do
   resource  :registration, only: %i[new create]
   resources :passwords, param: :token
 
+  get "auth/google_oauth2/callback", to: "sessions/omniauth#create"
+  get "auth/failure",                to: "sessions/omniauth#failure"
+  resource :google_registration,   only: %i[new create]
+  resource :two_factor,            only: %i[new create destroy]
+  resource :two_factor_challenge,  only: %i[new create]
+
   get "privacy", to: "pages#privacy", as: :privacy
 
   namespace :stripe do
@@ -16,7 +22,7 @@ Rails.application.routes.draw do
   resources :homologation_requests, only: %i[index new create show edit update] do
     resource  :submission, only: :create, controller: "homologation_request_submissions"
     resource  :checkout,   only: :create, controller: "homologation_request_checkouts"
-    resources :documents,  only: %i[create destroy], controller: "homologation_request_documents"
+    resources :documents,  only: %i[show create destroy], controller: "homologation_request_documents"
   end
 
   resource :profile, only: %i[show edit update] do

@@ -67,6 +67,10 @@ module ApplicationHelper
     Rails.application.credentials.dig(:brand, :location) || "City, Country"
   end
 
+  def google_sign_in_enabled?
+    Rails.application.credentials.dig(:google, :client_id).present?
+  end
+
   def marketing_url(path = nil)
     base = Rails.application.credentials.dig(:brand, :marketing_url) || "https://spaceforedu.com"
     suffix = path.present? ? "#{path}/" : ""

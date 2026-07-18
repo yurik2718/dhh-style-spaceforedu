@@ -7,7 +7,17 @@ module Stripe
         Rails.application.credentials.dig(:stripe, :webhook_secret)
       )
 
-      handle(event) if record(event)
+      if record(event)
+        begin
+          handle(event)
+        rescue => e
+          # Forget the event so Stripe's retry gets processed fresh instead of
+          # being dropped as a duplicate — a payment must never be lost silently.
+          StripeEvent.where(id: event.id).delete_all
+          Rails.error.report(e, handled: true, context: { stripe_event_id: event.id })
+          return head :internal_server_error
+        end
+      end
       head :ok
     rescue ::Stripe::SignatureVerificationError, JSON::ParserError
       head :bad_request
@@ -42,7 +52,7 @@ module Stripe
         request = find_request(intent)
         return unless request
         admin = User.super_admin
-        return unless admin
+        raise "no super_admin user — cannot confirm payment for request ##{request.id}" unless admin
 
         request.confirm_payment!(confirmed_by: admin)
         admin.notify(
@@ -57,10 +67,15 @@ module Stripe
       def notify_payment_failed(intent)
         request = find_request(intent)
         return unless request
-        admin = User.super_admin
-        return unless admin
 
-        admin.notify(
+        request.user.notify(
+          notifiable: request,
+          title_key:  "notifications.payment_failed_student.title",
+          body_key:   "notifications.payment_failed_student.body",
+          subject:    request.subject
+        )
+
+        User.super_admin&.notify(
           notifiable: request,
           title_key:  "notifications.payment_failed.title",
           body_key:   "notifications.payment_failed.body",

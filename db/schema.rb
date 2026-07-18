@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_10_080252) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_17_114325) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -48,6 +48,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_080252) do
     t.datetime "updated_at", null: false
     t.index ["homologation_request_id"], name: "index_conversations_on_homologation_request_id", unique: true
     t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
+  end
+
+  create_table "document_accesses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "request_document_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.string "via", null: false
+    t.index ["request_document_id"], name: "index_document_accesses_on_request_document_id"
+    t.index ["user_id"], name: "index_document_accesses_on_user_id"
   end
 
   create_table "homologation_requests", force: :cascade do |t|
@@ -161,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_080252) do
     t.datetime "deletion_requested_at"
     t.datetime "discarded_at"
     t.string "email_address", null: false
+    t.string "google_uid"
     t.string "guardian_email"
     t.string "guardian_name"
     t.string "guardian_phone"
@@ -171,6 +182,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_080252) do
     t.string "name", default: "", null: false
     t.boolean "notification_email", default: true, null: false
     t.boolean "notification_telegram", default: false, null: false
+    t.datetime "otp_enabled_at"
+    t.integer "otp_last_verified_timestep"
+    t.string "otp_secret"
     t.string "passport"
     t.string "password_digest", null: false
     t.string "phone"
@@ -184,12 +198,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_080252) do
     t.index ["deletion_requested_at"], name: "index_users_on_deletion_requested_at"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["google_uid"], name: "index_users_on_google_uid", unique: true
     t.check_constraint "role IN ('super_admin', 'student')", name: "valid_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "conversations", "homologation_requests"
+  add_foreign_key "document_accesses", "request_documents"
+  add_foreign_key "document_accesses", "users"
   add_foreign_key "homologation_requests", "users"
   add_foreign_key "homologation_requests", "users", column: "payment_confirmed_by"
   add_foreign_key "homologation_requests", "users", column: "pipeline_changed_by"

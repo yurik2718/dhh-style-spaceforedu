@@ -34,7 +34,7 @@ class HomologationRequestsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index without any kept requests renders the empty state CTA" do
-    fresh = User.create!(email_address: "fresh@example.com", password: "secret", name: "Fresh", role: "student")
+    fresh = User.create!(email_address: "fresh@example.com", password: "secret42", name: "Fresh", role: "student")
     sign_in_as fresh
 
     get homologation_requests_path

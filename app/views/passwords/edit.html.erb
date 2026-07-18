@@ -9,6 +9,7 @@
           required: true,
           autofocus: true,
           autocomplete: "new-password",
+          minlength: 8,
           maxlength: 72,
           placeholder: "••••••••",
           class: "input w-full" %>
@@ -19,6 +20,7 @@
     <%= f.password_field :password_confirmation,
           required: true,
           autocomplete: "new-password",
+          minlength: 8,
           maxlength: 72,
           placeholder: "••••••••",
           class: "input w-full" %>

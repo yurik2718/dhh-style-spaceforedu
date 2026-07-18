@@ -16,6 +16,15 @@ class Admin::HomologationRequests::ArchivesControllerTest < ActionDispatch::Inte
     assert_match %r{filename="homologation_Anna_#{@hr.id}\.zip"}, response.headers["Content-Disposition"]
   end
 
+  test "archive download logs an access row per document" do
+    sign_in_as users(:admin)
+    attach_request_document(@hr, kind: "diploma", filename: "diploma.pdf")
+
+    assert_difference -> { DocumentAccess.where(via: "archive").count }, 2 do
+      get admin_homologation_request_archive_path(@hr)
+    end
+  end
+
   test "students are redirected to root with not-authorized alert" do
     sign_in_as users(:student_es)
 

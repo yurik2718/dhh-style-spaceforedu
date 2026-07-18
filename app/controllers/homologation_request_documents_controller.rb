@@ -1,6 +1,20 @@
 class HomologationRequestDocumentsController < ApplicationController
   before_action :set_request
-  before_action :require_editable
+  before_action :require_editable, except: :show
+
+  # Documents hold passport-grade PII, so they are streamed through the app
+  # after a Pundit check instead of being linked as signed Active Storage URLs
+  # anyone holding the link could fetch.
+  def show
+    authorize @homologation_request, :show?
+
+    document = @homologation_request.request_documents.find(params[:id])
+    document.record_access!(by: Current.user, via: "download")
+    send_data document.file.download,
+              filename:    document.download_filename,
+              type:        document.file.content_type,
+              disposition: "attachment"
+  end
 
   def create
     authorize @homologation_request, :update?

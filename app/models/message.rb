@@ -1,7 +1,6 @@
 class Message < ApplicationRecord
   belongs_to :conversation, strict_loading: false
   belongs_to :user,         strict_loading: false
-  has_many_attached :attachments
 
   validates :body, presence: true
 

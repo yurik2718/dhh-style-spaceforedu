@@ -30,7 +30,7 @@
 
         <div class="flex items-center gap-3 mt-1.5 text-xs">
           <%= link_to t("requests.attachments.download"),
-                rails_blob_path(document.file, disposition: "attachment", filename: document.download_filename),
+                homologation_request_document_path(hr, document.id),
                 data:  { turbo_frame: "_top" },
                 class: "text-mute hover:text-ink underline-offset-2 hover:underline" %>
 

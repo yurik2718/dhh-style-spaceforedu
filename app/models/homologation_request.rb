@@ -107,6 +107,7 @@ class HomologationRequest < ApplicationRecord
   end
 
   def advance_pipeline!(changed_by:)
+    ensure_pipeline_movable!
     next_stage = PipelineFlow.next_stage(pipeline_stage, country: user.country)
     raise InvalidTransition, "no next pipeline stage from #{pipeline_stage.inspect}" if next_stage.nil?
 
@@ -118,6 +119,7 @@ class HomologationRequest < ApplicationRecord
   end
 
   def retreat_pipeline!(changed_by:, reason:)
+    ensure_pipeline_movable!
     raise ArgumentError, "reason can't be blank" if reason.to_s.strip.empty?
 
     prev_stage = PipelineFlow.previous_stage(pipeline_stage, country: user.country)
@@ -144,6 +146,13 @@ class HomologationRequest < ApplicationRecord
   class InvalidTransition < StandardError; end
 
   private
+    # The kanban exists only between "money received" and a terminal outcome —
+    # the two axes must not drift apart.
+    def ensure_pipeline_movable!
+      raise InvalidTransition, "pipeline requires a confirmed payment" if payment_confirmed_at.blank?
+      raise InvalidTransition, "cannot move pipeline of a #{status} request" if terminal?
+    end
+
     def notify_admin_of_submission
       admin = User.super_admin
       return unless admin

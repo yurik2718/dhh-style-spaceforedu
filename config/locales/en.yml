@@ -1,6 +1,7 @@
 en:
   errors:
     not_authorized:        "You are not authorized to perform this action."
+    google_auth_failed:            "Could not sign in with Google. Please try again."
     privacy_required:      "must be accepted to register"
     rate_limited:                  "Too many attempts. Try again later."
     unknown_checklist_key:         "Unknown checklist key."
@@ -120,7 +121,42 @@ en:
       title:    "University degree homologation"
       subtitle: "We handle the recognition of your degree in Spain — efficient, transparent, with real-time tracking."
 
+  admin_digest:
+    subject: "Weekly review: %{stale} stalled, %{inbox} awaiting reply"
+    stale_heading:
+      one:   "1 case hasn't moved in over a week:"
+      other: "%{count} cases haven't moved in over a week:"
+    inbox_heading:
+      one:   "1 request is waiting for your reply:"
+      other: "%{count} requests are waiting for your reply:"
+    days_idle:
+      one:   "1 day idle"
+      other: "%{count} days idle"
+    footer_url: "Open the pipeline: %{url}"
+  two_factor:
+    section_title:      "Two-factor authentication"
+    status_enabled:     "Enabled — a code is required at every sign-in."
+    status_disabled:    "Protect this account with one-time codes from an authenticator app."
+    enable_button:      "Set up 2FA"
+    disable_button:     "Disable"
+    setup_title:        "Set up two-factor authentication"
+    setup_step_scan:    "Scan the QR code with Google Authenticator, 1Password or any TOTP app."
+    setup_manual_secret: "Or enter the key manually:"
+    setup_step_confirm: "Enter the 6-digit code from the app to confirm"
+    setup_submit:       "Turn on 2FA"
+    enabled_notice:     "Two-factor authentication is on."
+    disabled_notice:    "Two-factor authentication is off."
+    invalid_code:       "That code didn't match. Try the current one from your app."
+    challenge_title:    "Enter your code"
+    challenge_hint:     "Open your authenticator app and enter the 6-digit code."
+    challenge_submit:   "Verify"
+    code_label:         "6-digit code"
+  google_auth:
+    consent_title:  "Almost there"
+    consent_hint:   "You are signing in with Google as %{email}. One last step before we create your account."
+    consent_submit: "Create my account"
   auth:
+    continue_with_google: "Continue with Google"
     password:               "Password"
     new_password:           "New password"
     repeat_password:        "Repeat new password"
@@ -480,6 +516,9 @@ en:
     payment_failed:
       title: "Payment failed for \"%{subject}\""
       body:  "Stripe reports the payment intent failed. Investigate and contact the student."
+    payment_failed_student:
+      title: "Payment for \"%{subject}\" didn't go through"
+      body:  "Your card was not charged. Please open your request and try the payment again."
     request_submitted:
       title: "New submission: \"%{subject}\""
       body:  "%{student} just submitted their request. Time to review."

@@ -94,6 +94,31 @@
     </div>
   <% end %>
 
+  <%# 2FA — super admin only: this account can open every client's documents %>
+  <% if @user.super_admin? %>
+    <div class="card bg-canvas border border-hairline-soft">
+      <div class="card-body space-y-3" style="--card-body-pad: 1.5rem">
+        <h3 class="text-base font-semibold text-ink"><%= t("two_factor.section_title") %></h3>
+
+        <% if @user.otp_enabled_at? %>
+          <p class="text-sm text-success"><%= t("two_factor.status_enabled") %></p>
+          <%= form_with url: two_factor_path, method: :delete, class: "flex items-end gap-3" do |f| %>
+            <div>
+              <label class="label" for="<%= f.field_id(:code) %>"><%= t("two_factor.code_label") %></label>
+              <%= f.text_field :code, required: true, autocomplete: "one-time-code",
+                    inputmode: "numeric", maxlength: 10, class: "input input-sm w-36" %>
+            </div>
+            <%= f.submit t("two_factor.disable_button"),
+                  class: "btn btn-sm bg-transparent border border-error text-error hover:bg-error/10" %>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-mute"><%= t("two_factor.status_disabled") %></p>
+          <%= link_to t("two_factor.enable_button"), new_two_factor_path, class: "btn btn-sm btn-secondary" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <%# GDPR — visually separated danger zone %>
   <div class="border-t border-hairline-soft pt-6">
     <p class="text-xs font-semibold text-mute uppercase tracking-wider mb-4"><%= t("profile.gdpr.title") %></p>

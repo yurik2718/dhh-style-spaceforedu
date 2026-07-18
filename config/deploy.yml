@@ -1,17 +1,17 @@
 service: spaceforedu
-image: YOUR_GITHUB_USERNAME/spaceforedu
+image: yurik2718/spaceforedu
 
 servers:
   web:
-    - YOUR_VPS_IP
+    - YOUR_VPS_IP # replace with the server's public IP before `kamal setup`
 
 proxy:
   ssl: true
-  host: YOUR_DOMAIN
+  host: app.spaceforedu.com
 
 registry:
   server: ghcr.io
-  username: YOUR_GITHUB_USERNAME
+  username: yurik2718
   password:
     - KAMAL_REGISTRY_PASSWORD
 

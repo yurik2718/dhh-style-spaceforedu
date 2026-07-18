@@ -38,6 +38,8 @@
   </div>
 <% end %>
 
+<%= render "shared/google_sign_in" %>
+
 <div class="divider"><%= t("auth.or") %></div>
 
 <%= link_to t("registrations.submit"), new_registration_path,

@@ -1,0 +1,22 @@
+<% content_for :title, t("two_factor.challenge_title") %>
+
+<h1 class="font-display font-bold text-4xl text-ink leading-[1.1] tracking-tight">
+  <%= t("two_factor.challenge_title") %>
+</h1>
+<p class="text-sm text-mute mt-2"><%= t("two_factor.challenge_hint") %></p>
+
+<%= form_with url: two_factor_challenge_path, class: "space-y-5 mt-6" do |f| %>
+  <div>
+    <label class="label" for="<%= f.field_id(:code) %>"><%= t("two_factor.code_label") %></label>
+    <%= f.text_field :code,
+          required: true,
+          autofocus: true,
+          autocomplete: "one-time-code",
+          inputmode: "numeric",
+          maxlength: 10,
+          placeholder: "123 456",
+          class: "input w-full text-center tracking-[0.3em]" %>
+  </div>
+
+  <%= f.submit t("two_factor.challenge_submit"), class: "btn btn-primary w-full h-12 text-base" %>
+<% end %>

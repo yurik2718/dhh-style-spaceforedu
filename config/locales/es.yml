@@ -1,6 +1,7 @@
 es:
   errors:
     not_authorized:        "No tienes permiso para realizar esta acción."
+    google_auth_failed:            "No se pudo iniciar sesión con Google. Inténtalo de nuevo."
     privacy_required:      "debe ser aceptada para registrarse"
     rate_limited:                  "Demasiados intentos. Inténtalo más tarde."
     unknown_checklist_key:         "Clave de lista de documentos desconocida."
@@ -120,7 +121,42 @@ es:
       title:    "Homologación de títulos universitarios"
       subtitle: "Gestionamos el reconocimiento de tu título en España de forma eficiente, transparente y con seguimiento en tiempo real."
 
+  admin_digest:
+    subject: "Repaso semanal: %{stale} sin movimiento, %{inbox} sin responder"
+    stale_heading:
+      one:   "1 expediente lleva más de una semana sin moverse:"
+      other: "%{count} expedientes llevan más de una semana sin moverse:"
+    inbox_heading:
+      one:   "1 solicitud espera tu respuesta:"
+      other: "%{count} solicitudes esperan tu respuesta:"
+    days_idle:
+      one:   "1 día parado"
+      other: "%{count} días parado"
+    footer_url: "Abrir el pipeline: %{url}"
+  two_factor:
+    section_title:      "Autenticación en dos pasos"
+    status_enabled:     "Activada — se pide un código en cada inicio de sesión."
+    status_disabled:    "Protege esta cuenta con códigos de un solo uso de una app de autenticación."
+    enable_button:      "Configurar 2FA"
+    disable_button:     "Desactivar"
+    setup_title:        "Configurar autenticación en dos pasos"
+    setup_step_scan:    "Escanea el código QR con Google Authenticator, 1Password o cualquier app TOTP."
+    setup_manual_secret: "O introduce la clave manualmente:"
+    setup_step_confirm: "Introduce el código de 6 dígitos de la app para confirmar"
+    setup_submit:       "Activar 2FA"
+    enabled_notice:     "Autenticación en dos pasos activada."
+    disabled_notice:    "Autenticación en dos pasos desactivada."
+    invalid_code:       "El código no coincide. Prueba con el código actual de tu app."
+    challenge_title:    "Introduce tu código"
+    challenge_hint:     "Abre tu app de autenticación e introduce el código de 6 dígitos."
+    challenge_submit:   "Verificar"
+    code_label:         "Código de 6 dígitos"
+  google_auth:
+    consent_title:  "Ya casi está"
+    consent_hint:   "Estás accediendo con Google como %{email}. Un último paso antes de crear tu cuenta."
+    consent_submit: "Crear mi cuenta"
   auth:
+    continue_with_google: "Continuar con Google"
     password:               "Contraseña"
     new_password:           "Nueva contraseña"
     repeat_password:        "Repetir nueva contraseña"
@@ -480,6 +516,9 @@ es:
     payment_failed:
       title: "Pago fallido en «%{subject}»"
       body:  "Stripe reporta que la intención de pago falló. Revisa y contacta al estudiante."
+    payment_failed_student:
+      title: "El pago de \"%{subject}\" no se ha completado"
+      body:  "No se ha realizado ningún cargo. Abre tu solicitud e inténtalo de nuevo."
     request_submitted:
       title: "Nueva solicitud: «%{subject}»"
       body:  "%{student} acaba de enviar su solicitud. Toca revisarla."

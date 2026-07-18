@@ -2,8 +2,8 @@
 
 Rails 8 application for international students seeking document-equivalence (homologación) recognition in Spain. Students submit requests, upload documents, and chat with a super admin who shepherds the case through Spanish bureaucracy.
 
-- `homologation.es` — Astro.js landing page (separate repo)
-- `app.homologation.es` — this Rails app
+- `spaceforedu.com` — marketing/landing site (separate repo)
+- `app.spaceforedu.com` — this Rails app
 
 ## Git rules for AI agents
 
