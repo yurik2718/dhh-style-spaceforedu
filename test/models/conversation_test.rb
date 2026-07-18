@@ -46,6 +46,19 @@ class ConversationTest < ActiveSupport::TestCase
     assert @conversation.unread_for?(@student)
   end
 
+  test "unread_for? and mark_read_for! treat staff the same as super_admin" do
+    staff = users(:staff_es)
+
+    travel_to(1.year.ago) { @conversation.mark_read_for!(@student) }
+    assert @conversation.unread_for?(staff)
+
+    freeze_time do
+      @conversation.mark_read_for!(staff)
+      assert_equal Time.current, @conversation.reload.admin_last_read_at
+    end
+    refute @conversation.unread_for?(staff)
+  end
+
   test "mark_read_for! sets admin_last_read_at for super_admins" do
     freeze_time do
       @conversation.mark_read_for!(@admin)

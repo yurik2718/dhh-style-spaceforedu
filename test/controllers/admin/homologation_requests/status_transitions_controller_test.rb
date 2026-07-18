@@ -16,6 +16,15 @@ class Admin::HomologationRequests::StatusTransitionsControllerTest < ActionDispa
     assert_equal "in_review", @homologation_request.reload.status
   end
 
+  test "staff transitions status and is redirected" do
+    sign_in_as users(:staff_es)
+    post admin_homologation_request_status_transitions_path(@homologation_request),
+         params: { status_transition: { status: "in_review" } }
+
+    assert_redirected_to admin_homologation_request_path(@homologation_request)
+    assert_equal "in_review", @homologation_request.reload.status
+  end
+
   test "invalid status redirects with an alert" do
     sign_in_as @admin
     post admin_homologation_request_status_transitions_path(@homologation_request),

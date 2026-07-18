@@ -45,6 +45,7 @@ es:
     data_exported:              "Tus datos han sido exportados."
     deletion_requested:         "Solicitud de eliminación registrada. Procesaremos tu solicitud en un plazo máximo de 30 días."
     deletion_already_requested: "Ya tienes una solicitud de eliminación pendiente."
+    staff_member_invited:       "Invitación enviada. Recibirá un correo para configurar su contraseña."
 
   profile:
     edit_title: "Editar perfil"
@@ -397,6 +398,11 @@ es:
     enter_hint: "Enter — enviar · Shift+Enter — nueva línea"
 
   admin:
+    staff_members:
+      title:    "Invitar a un miembro del equipo"
+      subtitle: "Recibirá un correo para configurar su propia contraseña."
+      submit:   "Enviar invitación"
+      nav:      "Invitar a alguien"
     requests:
       sections:
         student:        "Estudiante"

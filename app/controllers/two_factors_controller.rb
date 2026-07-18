@@ -1,8 +1,9 @@
-# Setup/teardown of TOTP for the super admin's own account. Students don't get
-# 2FA — they hold no one's data but their own; the admin holds everyone's.
+# Setup/teardown of TOTP for a case-handling account (super_admin or staff).
+# Students don't get 2FA — they hold no one's data but their own; case
+# handlers hold everyone's.
 class TwoFactorsController < ApplicationController
   skip_after_action :verify_authorized
-  before_action :require_super_admin
+  before_action :require_case_staff
 
   def new
     prepare_setup
@@ -35,8 +36,8 @@ class TwoFactorsController < ApplicationController
   end
 
   private
-    def require_super_admin
-      redirect_to root_path, alert: t("errors.not_authorized") unless Current.user.super_admin?
+    def require_case_staff
+      redirect_to root_path, alert: t("errors.not_authorized") unless Current.user.case_staff?
     end
 
     def prepare_setup

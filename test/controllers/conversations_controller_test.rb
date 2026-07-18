@@ -37,6 +37,14 @@ class ConversationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action='quick-replies#insert']"
   end
 
+  test "staff sees any conversation and its quick reply pills" do
+    sign_in_as users(:staff_es)
+    get conversation_url(@conversation)
+
+    assert_response :ok
+    assert_select "button[data-action='quick-replies#insert']"
+  end
+
   test "students do not see quick reply pills" do
     sign_in_as @student
     get conversation_url(@conversation)

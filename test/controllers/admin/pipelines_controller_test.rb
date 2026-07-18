@@ -35,6 +35,23 @@ class Admin::PipelinesControllerTest < ActionDispatch::IntegrationTest
     assert_select "section[data-stage=documentos] ##{ActionView::RecordIdentifier.dom_id(request_record)}"
   end
 
+  test "staff reaches show but does not see the invite-staff link" do
+    sign_in_as users(:staff_es)
+
+    get admin_pipeline_path
+
+    assert_response :success
+    assert_select "a[href=?]", new_admin_staff_member_path, count: 0
+  end
+
+  test "super_admin sees the invite-staff link" do
+    sign_in_as users(:admin)
+
+    get admin_pipeline_path
+
+    assert_select "a[href=?]", new_admin_staff_member_path
+  end
+
   test "revenue stat is always rendered in euros, never dollars" do
     sign_in_as users(:admin)
 

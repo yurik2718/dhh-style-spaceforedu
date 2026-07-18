@@ -10,12 +10,12 @@ class Conversation < ApplicationRecord
   end
 
   def unread_for?(user)
-    last_read = user.super_admin? ? admin_last_read_at : student_last_read_at
+    last_read = user.case_staff? ? admin_last_read_at : student_last_read_at
     messages.where("created_at > ?", last_read || Time.at(0)).exists?
   end
 
   def mark_read_for!(user)
-    if user.super_admin?
+    if user.case_staff?
       update!(admin_last_read_at: Time.current)
     else
       update!(student_last_read_at: Time.current)

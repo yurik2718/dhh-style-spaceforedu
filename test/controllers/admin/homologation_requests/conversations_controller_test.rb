@@ -31,6 +31,15 @@ class Admin::HomologationRequests::ConversationsControllerTest < ActionDispatch:
     assert_redirected_to conversation_path(existing)
   end
 
+  test "staff can start a conversation" do
+    request_record = homologation_requests(:awaiting_payment)
+    sign_in_as users(:staff_es)
+
+    assert_difference("Conversation.count", 1) do
+      post admin_homologation_request_conversation_path(request_record)
+    end
+  end
+
   test "students cannot start a conversation through admin endpoint" do
     sign_in_as users(:student_es)
     post admin_homologation_request_conversation_path(homologation_requests(:awaiting_payment))

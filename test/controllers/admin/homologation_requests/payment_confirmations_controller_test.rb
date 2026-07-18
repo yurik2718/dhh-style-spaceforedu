@@ -19,6 +19,14 @@ class Admin::HomologationRequests::PaymentConfirmationsControllerTest < ActionDi
     assert_equal @admin.id,           @homologation_request.payment_confirmed_by
   end
 
+  test "staff cannot confirm payment" do
+    sign_in_as users(:staff_es)
+    post admin_homologation_request_payment_confirmation_path(@homologation_request)
+
+    assert_redirected_to root_path
+    assert_equal "awaiting_payment", @homologation_request.reload.status
+  end
+
   test "students cannot confirm payment" do
     sign_in_as users(:student_es)
     post admin_homologation_request_payment_confirmation_path(@homologation_request)

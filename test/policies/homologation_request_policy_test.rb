@@ -3,6 +3,7 @@ require "test_helper"
 class HomologationRequestPolicyTest < ActiveSupport::TestCase
   setup do
     @admin   = users(:admin)
+    @staff   = users(:staff_es)
     @student = users(:student_es)
     @other   = users(:student_other)
     @owned   = homologation_requests(:in_pipeline_es)
@@ -10,6 +11,10 @@ class HomologationRequestPolicyTest < ActiveSupport::TestCase
 
   test "show? is true for super_admin viewing any request" do
     assert HomologationRequestPolicy.new(@admin, @owned).show?
+  end
+
+  test "show? is true for staff viewing any request" do
+    assert HomologationRequestPolicy.new(@staff, @owned).show?
   end
 
   test "show? is true for the student who owns the request" do
@@ -26,8 +31,16 @@ class HomologationRequestPolicyTest < ActiveSupport::TestCase
 
   test "manage_pipeline? is true only for super_admin" do
     assert HomologationRequestPolicy.new(@admin,   @owned).manage_pipeline?
+    refute HomologationRequestPolicy.new(@staff,   @owned).manage_pipeline?
     refute HomologationRequestPolicy.new(@student, @owned).manage_pipeline?
     refute HomologationRequestPolicy.new(nil,      @owned).manage_pipeline?
+  end
+
+  test "manage_case? is true for super_admin and staff, false for students" do
+    assert HomologationRequestPolicy.new(@admin,   @owned).manage_case?
+    assert HomologationRequestPolicy.new(@staff,   @owned).manage_case?
+    refute HomologationRequestPolicy.new(@student, @owned).manage_case?
+    refute HomologationRequestPolicy.new(nil,      @owned).manage_case?
   end
 
   test "create? is true for any signed-in student" do
@@ -49,6 +62,12 @@ class HomologationRequestPolicyTest < ActiveSupport::TestCase
 
   test "Scope#resolve returns all requests for super_admin" do
     resolved = HomologationRequestPolicy::Scope.new(@admin, HomologationRequest.all).resolve
+
+    assert_equal HomologationRequest.count, resolved.count
+  end
+
+  test "Scope#resolve returns all requests for staff" do
+    resolved = HomologationRequestPolicy::Scope.new(@staff, HomologationRequest.all).resolve
 
     assert_equal HomologationRequest.count, resolved.count
   end

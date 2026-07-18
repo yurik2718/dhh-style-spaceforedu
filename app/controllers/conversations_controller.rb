@@ -1,6 +1,6 @@
 class ConversationsController < ApplicationController
   def show
-    hr_includes = Current.user.super_admin? ? { homologation_request: :user } : :homologation_request
+    hr_includes = Current.user.case_staff? ? { homologation_request: :user } : :homologation_request
     @conversation = Conversation.includes(hr_includes).find(params[:id])
     authorize @conversation
 

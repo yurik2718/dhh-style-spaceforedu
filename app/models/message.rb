@@ -14,20 +14,19 @@ class Message < ApplicationRecord
     end
 
     def notify_counterpart
-      recipient = counterpart
-      return unless recipient
-
-      recipient.notify(
-        notifiable: conversation.homologation_request,
-        title_key:  "notifications.new_message.title",
-        body_key:   "notifications.new_message.body",
-        subject:    conversation.homologation_request.subject,
-        sender:     user.name
-      )
+      counterpart.each do |recipient|
+        recipient.notify(
+          notifiable: conversation.homologation_request,
+          title_key:  "notifications.new_message.title",
+          body_key:   "notifications.new_message.body",
+          subject:    conversation.homologation_request.subject,
+          sender:     user.name
+        )
+      end
     end
 
     def counterpart
       owner = conversation.homologation_request.user
-      user == owner ? User.super_admin : owner
+      user == owner ? User.case_staff : [ owner ]
     end
 end

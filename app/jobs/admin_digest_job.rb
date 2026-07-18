@@ -1,5 +1,6 @@
-# Weekly nudge for the owner: pipeline cases that haven't moved and inbox
-# items nobody answered. Sends nothing when the desk is clean.
+# Weekly nudge for every case handler (owner + staff): pipeline cases that
+# haven't moved and inbox items nobody answered. Sends nothing when the desk
+# is clean.
 class AdminDigestJob < ApplicationJob
   queue_as :default
 
@@ -7,8 +8,8 @@ class AdminDigestJob < ApplicationJob
   INBOX_STALE_AFTER    = 2.days
 
   def perform
-    admin = User.super_admin
-    return unless admin
+    admins = User.case_staff
+    return if admins.none?
 
     stale = HomologationRequest.kept.includes(:user)
       .where(status: %w[payment_confirmed in_progress])
@@ -24,6 +25,8 @@ class AdminDigestJob < ApplicationJob
 
     return if stale.empty? && inbox.empty?
 
-    AdminDigestMailer.weekly(admin: admin, stale: stale, inbox: inbox).deliver_later
+    admins.each do |admin|
+      AdminDigestMailer.weekly(admin: admin, stale: stale, inbox: inbox).deliver_later
+    end
   end
 end

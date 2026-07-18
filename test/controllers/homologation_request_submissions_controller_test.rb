@@ -33,6 +33,15 @@ class HomologationRequestSubmissionsControllerTest < ActionDispatch::Integration
     assert_equal "notifications.request_submitted.title", notification.title_key
   end
 
+  test "POST create notifies staff too, not just the super admin" do
+    sign_in_as @student
+    staff = users(:staff_es)
+
+    assert_difference -> { staff.notifications.where(notifiable: @draft).count }, 1 do
+      post homologation_request_submission_path(@draft)
+    end
+  end
+
   test "POST create on a non-draft status redirects with an alert" do
     sign_in_as @student
     submitted = @student.homologation_requests.create!(
@@ -95,6 +104,21 @@ class HomologationRequestSubmissionsControllerTest < ActionDispatch::Integration
     assert_redirected_to homologation_request_path(awaiting)
     assert_equal I18n.t("flash.reply_sent"), flash[:notice]
     assert_equal "in_review", awaiting.reload.status
+  end
+
+  test "POST create on awaiting_reply notifies staff too, not just the super admin" do
+    awaiting = @student.homologation_requests.create!(
+      subject: "Reply ready", plan_key: "basico", status: "awaiting_reply", privacy_accepted: true
+    )
+    RequestDocument::REQUIRED_KINDS.each { |kind| attach_request_document(awaiting, kind: kind) }
+    staff = users(:staff_es)
+    sign_in_as @student
+
+    assert_difference -> {
+      staff.notifications.where(notifiable: awaiting, title_key: "notifications.documents_added.title").count
+    }, 1 do
+      post homologation_request_submission_path(awaiting)
+    end
   end
 
   test "POST create on awaiting_reply by a different student is rejected" do

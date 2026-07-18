@@ -3,7 +3,7 @@
 <% content_for :main_class, "flex flex-col min-h-0 container mx-auto px-4 py-4" %>
 
 <% hr = @conversation.homologation_request %>
-<% back_path = Current.user.super_admin? ? admin_homologation_request_path(hr) : homologation_request_path(hr) %>
+<% back_path = Current.user.case_staff? ? admin_homologation_request_path(hr) : homologation_request_path(hr) %>
 
 <div class="flex flex-col flex-1 min-h-0 max-w-2xl w-full mx-auto bg-canvas border border-hairline-soft rounded-lg overflow-hidden">
 
@@ -14,7 +14,7 @@
       <% end %>
       <div class="min-w-0">
         <p class="font-semibold text-sm text-ink truncate leading-tight"><%= hr.subject %></p>
-        <% if Current.user.super_admin? %>
+        <% if Current.user.case_staff? %>
           <p class="text-xs text-mute truncate"><%= @conversation.student.name %></p>
         <% end %>
       </div>

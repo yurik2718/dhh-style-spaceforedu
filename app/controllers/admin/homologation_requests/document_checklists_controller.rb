@@ -1,7 +1,7 @@
 class Admin::HomologationRequests::DocumentChecklistsController < ApplicationController
   def update
     request_record = HomologationRequest.kept.find(params[:homologation_request_id])
-    authorize request_record, :manage_pipeline?
+    authorize request_record, :manage_case?
 
     key = checklist_params[:key]
     unless PipelineFlow.checklist_keys.include?(key)

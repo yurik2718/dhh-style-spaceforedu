@@ -25,6 +25,14 @@ class Admin::HomologationRequests::ArchivesControllerTest < ActionDispatch::Inte
     end
   end
 
+  test "staff downloads a zip archive" do
+    sign_in_as users(:staff_es)
+
+    get admin_homologation_request_archive_path(@hr)
+
+    assert_response :success
+  end
+
   test "students are redirected to root with not-authorized alert" do
     sign_in_as users(:student_es)
 

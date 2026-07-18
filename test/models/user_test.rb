@@ -16,6 +16,40 @@ class UserTest < ActiveSupport::TestCase
     refute     users(:admin).student?
   end
 
+  test "staff? is true for staff role and false for student or super_admin" do
+    assert     User.new(role: "staff").staff?
+    refute     users(:student_es).staff?
+    refute     users(:admin).staff?
+  end
+
+  test "case_staff? is true for staff and super_admin, false for student or nil" do
+    assert User.new(role: "staff").case_staff?
+    assert users(:admin).case_staff?
+    refute users(:student_es).case_staff?
+  end
+
+  test "otp_required? is true for staff or super_admin with 2FA enabled, false otherwise" do
+    staff = User.new(role: "staff", otp_enabled_at: Time.current)
+    assert staff.otp_required?
+
+    admin = users(:admin)
+    admin.otp_enabled_at = Time.current
+    assert admin.otp_required?
+
+    staff_without_otp = User.new(role: "staff")
+    refute staff_without_otp.otp_required?
+
+    student = users(:student_es)
+    student.otp_enabled_at = Time.current
+    refute student.otp_required?
+  end
+
+  test "DB check_constraint accepts staff role" do
+    user = User.create!(email_address: "newstaff@example.com", password: "secret42", name: "Staff", role: "staff")
+
+    assert_equal "staff", user.reload.role
+  end
+
   test "initials returns the first letter of the first two words, uppercased" do
     user = User.new(name: "ana maria", email_address: "x@example.com")
 
@@ -43,6 +77,18 @@ class UserTest < ActiveSupport::TestCase
   test ".kept excludes soft-deleted users" do
     assert_includes     User.kept, users(:admin)
     assert_not_includes User.kept, users(:discarded_user)
+  end
+
+  test ".case_staff returns kept super_admin and staff users, excluding students" do
+    assert_includes     User.case_staff, users(:admin)
+    assert_includes     User.case_staff, users(:staff_es)
+    assert_not_includes User.case_staff, users(:student_es)
+  end
+
+  test ".case_staff excludes soft-deleted staff" do
+    users(:staff_es).update_column(:discarded_at, Time.current)
+
+    assert_not_includes User.case_staff, users(:staff_es)
   end
 
   test "DB check_constraint rejects unknown role when the model is bypassed" do

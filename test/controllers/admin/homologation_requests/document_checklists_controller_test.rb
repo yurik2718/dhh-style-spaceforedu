@@ -24,6 +24,15 @@ class Admin::HomologationRequests::DocumentChecklistsControllerTest < ActionDisp
     refute @homologation_request.reload.checklist_done?("sol")
   end
 
+  test "staff toggles a checklist key on" do
+    sign_in_as users(:staff_es)
+    patch admin_homologation_request_document_checklist_path(@homologation_request),
+          params: { document_checklist: { key: "vol", value: "1" } }
+
+    assert_redirected_to admin_homologation_request_path(@homologation_request)
+    assert @homologation_request.reload.checklist_done?("vol")
+  end
+
   test "students cannot update checklist" do
     sign_in_as users(:student_es)
     patch admin_homologation_request_document_checklist_path(@homologation_request),

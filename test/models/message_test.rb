@@ -48,6 +48,15 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal request, notification.notifiable
   end
 
+  test "student message notifies every case_staff member, not just one admin" do
+    staff   = users(:staff_es)
+    request = @conversation.homologation_request
+
+    assert_difference -> { staff.notifications.count }, 1 do
+      @conversation.messages.create!(user: @student, body: "hello everyone")
+    end
+  end
+
   test "admin message notifies the student owner, not the admin sender" do
     admin = users(:admin)
 

@@ -8,14 +8,15 @@ class AdminDigestJobTest < ActiveSupport::TestCase
     HomologationRequest.update_all(status: "closed", pipeline_changed_at: 1.day.ago)
   end
 
-  test "emails the admin a digest of stale pipeline cases and unanswered inbox" do
+  test "emails every case_staff member a digest of stale pipeline cases and unanswered inbox" do
     stale = homologation_requests(:in_pipeline_es)
     stale.update_columns(status: "in_progress", pipeline_changed_at: 10.days.ago)
 
     inbox = homologation_requests(:awaiting_payment)
     inbox.update_columns(status: "submitted", status_changed_at: 3.days.ago, payment_confirmed_at: nil)
 
-    assert_enqueued_emails 1 do
+    # One email per case_staff member (fixtures: admin + staff_es), not just the super admin.
+    assert_enqueued_emails 2 do
       AdminDigestJob.perform_now
     end
   end

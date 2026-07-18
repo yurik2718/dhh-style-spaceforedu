@@ -66,9 +66,10 @@ Ship and validate the core homologation flow with real students before adding an
 
 - No new models, tables, or domain concepts without explicit instruction
 - No third-party integrations beyond Stripe and Telegram (no OAuth, analytics, S3)
-- No roles beyond `super_admin` and `student`
 - No Redis, no Sidekiq — Solid Queue is the only background system
 - A thin slice that works beats a wide surface that doesn't
+
+**Roles:** `super_admin`, `staff`, `student`. `staff` was added deliberately post-MVP (2026-07) so the business owner can delegate case handling without being the only person who can work a case — see the Roles section below for the exact permission split. Don't add a *fourth* role without explicit instruction; the same "thin slice" discipline applies here as everywhere else.
 
 **Out of scope:** teachers, coordinators, lessons, study plans, multi-tenancy, organizations, public API, mobile app.
 
@@ -82,7 +83,7 @@ Ship and validate the core homologation flow with real students before adding an
 - **Litestream** — continuous SQLite replication to off-box storage; the only backup mechanism. A single-node Docker host means a lost disk is a lost app — the replica is the recovery story.
 - **Active Storage** — uploads on local disk, served through controllers
 - **Authentication** — Rails 8 `bin/rails generate authentication` (no Devise, no OAuth)
-- **Authorization** — Pundit, two roles only: `super_admin`, `student`
+- **Authorization** — Pundit, three roles: `super_admin`, `staff`, `student`
 - **Pagination** — Pagy
 - **Payments** — Stripe (`stripe` gem; admin records invoices, student pays, signed webhook confirms)
 - **Notifications** — in-app Turbo Streams + email (Action Mailer; SMTP in production, `letter_opener` in development) + Telegram Bot API (raw HTTP)
@@ -126,17 +127,20 @@ Rails 8 built-in auth generator. Tables: `users`, `sessions`. `has_secure_passwo
 
 Single `role` string column on `users`, enforced by a DB check constraint.
 
-| Role          | Root path     | Purpose                                                  |
-|---------------|---------------|----------------------------------------------------------|
-| `super_admin` | `/dashboard`  | Reviews requests, runs payments, manages users           |
-| `student`     | `/requests`   | Submits requests, uploads documents, chats with admin    |
+| Role          | Root path             | Purpose                                                                 |
+|---------------|------------------------|--------------------------------------------------------------------------|
+| `super_admin` | `/admin/pipeline`      | Everything `staff` can, plus: confirms payments, moves the kanban, invites staff |
+| `staff`       | `/admin/pipeline`      | Case handling — reviews requests, chats, changes status, requests documents, reads the pipeline (view-only). Delegated by `super_admin` via `Admin::StaffMembersController`. |
+| `student`     | `/requests`            | Submits requests, uploads documents, chats with admin                    |
 
-`authorize @record` in every controller action. `policy_scope` in every index. No role checks in views — call `policy(@record).action?`.
+`authorize @record` in every controller action. `policy_scope` in every index. Prefer `user&.case_staff?` (super_admin or staff) over checking `super_admin?` directly — most views/policies want "is this a case handler," not "is this specifically the owner." Use `manage_pipeline?` (super_admin-only) instead of `manage_case?` only for payment confirmation and kanban movement — everything else case-related is `manage_case?`. No role checks in views beyond that — call `policy(@record).action?`.
+
+`User.case_staff` returns every kept `super_admin` + `staff` user — the fan-out target for case-handling notifications (new submission, new chat message, stale-case digest). `User.super_admin` stays a singleton (first super_admin) and is reserved for owner-only concerns: Stripe payment notifications and the production error-report fallback address. Don't route financial or system-ops notifications through `case_staff` — that boundary is deliberate, matching what `staff` is and isn't authorized to act on.
 
 ### Domain models
 
 **User** — all roles in one table.
-- `role` enforced by check constraint (`super_admin` or `student`)
+- `role` enforced by check constraint (`super_admin`, `staff`, or `student`)
 - `discarded_at` for soft delete (always query through `.kept`)
 - Encrypted PII (Active Record encryption): `phone`, `whatsapp`, `guardian_phone`, `guardian_whatsapp`
 - Minor support: `is_minor`, `guardian_name`, `guardian_email`
@@ -150,7 +154,7 @@ Single `role` string column on `users`, enforced by a DB check constraint.
    draft → submitted → in_review ⇄ awaiting_reply → awaiting_payment
           → payment_confirmed → in_progress → resolved | closed
    ```
-2. **Pipeline** (super_admin only) — physical processing of documents *after payment*. See `### Pipeline (super_admin)` below.
+2. **Pipeline** (viewable by `case_staff?`, moved by `super_admin` only) — physical processing of documents *after payment*. See `### Pipeline` below.
 
 The DB check constraint enforces the *set* of valid statuses. The model's `transition_to!(new_status, changed_by:)` is the only sanctioned write path for `status`. Never `update(status: ...)` directly. Today the method validates the set; transition edges are policed by callers — when reverse edges become a real concern, the edge map moves into `transition_to!`. Audit columns `status_changed_by` / `status_changed_at` are written by the same method; `payment_confirmed_by` / `payment_confirmed_at` are written by `confirm_payment!`.
 
@@ -171,9 +175,9 @@ Three Active Storage attachments:
 
 **Notification** — in-app, polymorphic on `notifiable` (`notifiable_type` / `notifiable_id`; today: `HomologationRequest`, `Message`). Broadcasts via Turbo Streams on create. Delivered async to email and Telegram via `NotificationDeliveryJob`. `read_at` and `emailed_at` track delivery.
 
-### Pipeline (super_admin)
+### Pipeline
 
-Pipeline is the admin's **physical processing workflow** over a request *after payment is confirmed*. It is **not** `status` — `status` is the request's visible lifecycle to the student; `pipeline_stage` is the admin's internal map of where the paperwork is.
+Pipeline is the case handlers' **physical processing workflow** over a request *after payment is confirmed*. It is **not** `status` — `status` is the request's visible lifecycle to the student; `pipeline_stage` is the internal map of where the paperwork is. `staff` sees the kanban and stage of every request but cannot move it or confirm payment — that stays `super_admin`-only (see Roles above).
 
 Stages live in `config/pipeline.yml`, grouped by `display`:
 
@@ -205,7 +209,7 @@ end
 
 Drag-and-drop is deliberately not implemented. If kanban-buttons stop being enough after real usage, drag is added as a second iteration: explicit edge map in `advance_pipeline!`, server-side validation of the drop, optimistic UI rollback on error, system test with real `drag_to`.
 
-Authorization: `PipelinePolicy#show?` and `HomologationRequestPolicy#manage_pipeline?` — both `super_admin?` only. Index controller uses `policy_scope` so `verify_policy_scoped` is satisfied.
+Authorization: `PipelinePolicy#show?` (viewing the kanban) is `case_staff?` — `super_admin` or `staff`. `HomologationRequestPolicy#manage_pipeline?` (advancing/retreating a stage, confirming payment) is `super_admin?` only. Index controller uses `policy_scope` so `verify_policy_scoped` is satisfied.
 
 ### Real-time
 

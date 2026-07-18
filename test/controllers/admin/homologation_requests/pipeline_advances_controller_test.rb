@@ -15,6 +15,15 @@ class Admin::HomologationRequests::PipelineAdvancesControllerTest < ActionDispat
     assert_equal "traduccion", @homologation_request.reload.pipeline_stage
   end
 
+  test "staff cannot advance the pipeline" do
+    sign_in_as users(:staff_es)
+
+    post admin_homologation_request_pipeline_advance_path(@homologation_request)
+
+    assert_redirected_to root_path
+    assert_equal "documentos", @homologation_request.reload.pipeline_stage
+  end
+
   test "students are redirected to root with not-authorized alert" do
     sign_in_as users(:student_es)
 

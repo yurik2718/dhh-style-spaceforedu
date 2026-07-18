@@ -154,16 +154,15 @@ class HomologationRequest < ApplicationRecord
     end
 
     def notify_admin_of_submission
-      admin = User.super_admin
-      return unless admin
-
-      admin.notify(
-        notifiable: self,
-        title_key:  "notifications.request_submitted.title",
-        body_key:   "notifications.request_submitted.body",
-        subject:    subject,
-        student:    user.name
-      )
+      User.case_staff.each do |admin|
+        admin.notify(
+          notifiable: self,
+          title_key:  "notifications.request_submitted.title",
+          body_key:   "notifications.request_submitted.body",
+          subject:    subject,
+          student:    user.name
+        )
+      end
     end
 
     def notify_owner_of_status_change
@@ -187,16 +186,15 @@ class HomologationRequest < ApplicationRecord
     end
 
     def notify_admin_of_documents_reply
-      admin = User.super_admin
-      return unless admin
-
-      admin.notify(
-        notifiable: self,
-        title_key:  "notifications.documents_added.title",
-        body_key:   "notifications.documents_added.body",
-        subject:    subject,
-        student:    user.name
-      )
+      User.case_staff.each do |admin|
+        admin.notify(
+          notifiable: self,
+          title_key:  "notifications.documents_added.title",
+          body_key:   "notifications.documents_added.body",
+          subject:    subject,
+          student:    user.name
+        )
+      end
     end
 
     def create_conversation

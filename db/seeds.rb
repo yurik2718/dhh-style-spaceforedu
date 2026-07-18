@@ -37,6 +37,17 @@ admin = User.find_or_create_by!(email_address: "admin@spaceforedu.com") do |u|
   u.password            = "password"
 end
 
+# Delegated case handler — same case-management access as super_admin, no
+# payment/pipeline/user-management powers. Demonstrates the invite flow's result.
+User.find_or_create_by!(email_address: "staff@spaceforedu.com") do |u|
+  u.name                = "Lucía Navarro"
+  u.role                = "staff"
+  u.locale              = "es"
+  u.country             = "ES"
+  u.privacy_accepted_at = 3.months.ago
+  u.password            = "password"
+end
+
 # ─────────────────────────────────────────────────────────────
 # Students
 # ─────────────────────────────────────────────────────────────

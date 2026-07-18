@@ -12,6 +12,10 @@ class ConversationPolicyTest < ActiveSupport::TestCase
     assert ConversationPolicy.new(@admin, @conv).show?
   end
 
+  test "staff can show any conversation" do
+    assert ConversationPolicy.new(users(:staff_es), @conv).show?
+  end
+
   test "owner can show their conversation" do
     assert ConversationPolicy.new(@student, @conv).show?
   end

@@ -25,6 +25,16 @@ class TwoFactorTest < ActionDispatch::IntegrationTest
     assert_equal 0, @admin.sessions.count, "no session before the code is verified"
   end
 
+  test "staff with 2FA gets a code challenge instead of a session after the password" do
+    staff = users(:staff_es)
+    enable_2fa!(staff)
+
+    post session_path, params: { email_address: staff.email_address, password: "password" }
+
+    assert_redirected_to new_two_factor_challenge_path
+    assert_equal 0, staff.sessions.count, "no session before the code is verified"
+  end
+
   test "correct code completes the sign-in" do
     enable_2fa!(@admin)
     post session_path, params: { email_address: @admin.email_address, password: "password" }
@@ -115,6 +125,14 @@ class TwoFactorTest < ActionDispatch::IntegrationTest
     @admin.reload
     assert_nil @admin.otp_secret
     assert_nil @admin.otp_enabled_at
+  end
+
+  test "staff can open 2FA setup" do
+    sign_in_as users(:staff_es)
+
+    get new_two_factor_path
+
+    assert_response :ok
   end
 
   test "students cannot open 2FA setup" do

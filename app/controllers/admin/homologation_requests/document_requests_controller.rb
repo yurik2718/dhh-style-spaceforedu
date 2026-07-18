@@ -1,7 +1,7 @@
 class Admin::HomologationRequests::DocumentRequestsController < ApplicationController
   def create
     request_record = HomologationRequest.kept.includes(:user, :conversation).find(params[:homologation_request_id])
-    authorize request_record, :manage_pipeline?
+    authorize request_record, :manage_case?
 
     reason = document_request_params[:reason].to_s.strip
     if reason.empty?

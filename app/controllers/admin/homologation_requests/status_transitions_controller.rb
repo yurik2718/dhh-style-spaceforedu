@@ -1,7 +1,7 @@
 class Admin::HomologationRequests::StatusTransitionsController < ApplicationController
   def create
     request_record = HomologationRequest.kept.includes(:user, :conversation).find(params[:homologation_request_id])
-    authorize request_record, :manage_pipeline?
+    authorize request_record, :manage_case?
 
     new_status = transition_params[:status].to_s
     reason     = transition_params[:reason].to_s.strip

@@ -3,7 +3,7 @@ class Admin::HomologationRequests::ArchivesController < ApplicationController
     request_record = HomologationRequest.kept
       .includes(:user, request_documents: { file_attachment: :blob })
       .find(params[:homologation_request_id])
-    authorize request_record, :manage_pipeline?
+    authorize request_record, :manage_case?
 
     archive = RequestArchive.new(request_record)
     request_record.request_documents.each { |document| document.record_access!(by: Current.user, via: "archive") }

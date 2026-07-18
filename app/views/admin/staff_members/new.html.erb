@@ -1,0 +1,33 @@
+<%= render "shared/page_header", title: t("admin.staff_members.title") %>
+
+<p class="text-sm text-mute mb-6"><%= t("admin.staff_members.subtitle") %></p>
+
+<%= form_with model: @staff_member, url: admin_staff_members_path, class: "space-y-5 max-w-md" do |f| %>
+  <% if @staff_member.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside text-sm space-y-0.5">
+        <% @staff_member.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <label class="label" for="<%= f.field_id(:name) %>"><%= t("profile.fields.name") %></label>
+    <%= f.text_field :name,
+          required: true,
+          autofocus: true,
+          class: "input w-full" %>
+  </div>
+
+  <div>
+    <label class="label" for="<%= f.field_id(:email_address) %>"><%= t("profile.fields.email_address") %></label>
+    <%= f.email_field :email_address,
+          required: true,
+          placeholder: "you@example.com",
+          class: "input w-full" %>
+  </div>
+
+  <%= f.submit t("admin.staff_members.submit"), class: "btn btn-primary" %>
+<% end %>

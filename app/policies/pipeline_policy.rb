@@ -1,3 +1,3 @@
 class PipelinePolicy < ApplicationPolicy
-  def show? = user&.super_admin?
+  def show? = user&.case_staff?
 end

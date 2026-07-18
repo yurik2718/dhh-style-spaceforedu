@@ -1,4 +1,9 @@
-<%= render "shared/page_header", title: t("nav.pipeline") %>
+<% if Current.user.super_admin? %>
+  <% page_header_actions = capture do %>
+    <%= link_to t("admin.staff_members.nav"), new_admin_staff_member_path, class: "btn btn-ghost btn-sm" %>
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: t("nav.pipeline"), actions: page_header_actions %>
 
 <%# ── INBOX — pre-payment, needs admin verdict / reply ─────────── %>
 <section class="card bg-canvas border border-hairline-soft mb-6">

@@ -1,6 +1,6 @@
 <div id="message_form" class="border-t border-hairline-soft flex-shrink-0 bg-canvas"
      data-controller="quick-replies">
-  <% if Current.user.super_admin? %>
+  <% if Current.user.case_staff? %>
     <%= render "messages/quick_replies", conversation: conversation, hr: conversation.homologation_request %>
   <% end %>
 

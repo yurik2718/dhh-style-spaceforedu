@@ -37,6 +37,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resource :pipeline, only: :show
+    resources :staff_members, only: %i[new create]
 
     resources :homologation_requests, only: :show do
       scope module: :homologation_requests do

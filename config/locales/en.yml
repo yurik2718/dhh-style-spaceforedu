@@ -45,6 +45,7 @@ en:
     data_exported:              "Your data has been exported."
     deletion_requested:         "Deletion request received. We will process it within 30 days."
     deletion_already_requested: "You already have a pending deletion request."
+    staff_member_invited:       "Invitation sent. They'll receive an email to set their password."
 
   profile:
     edit_title: "Edit profile"
@@ -397,6 +398,11 @@ en:
     enter_hint: "Enter — send · Shift+Enter — new line"
 
   admin:
+    staff_members:
+      title:    "Invite a team member"
+      subtitle: "They'll receive an email to set their own password."
+      submit:   "Send invitation"
+      nav:      "Invite someone"
     requests:
       sections:
         student:        "Student"

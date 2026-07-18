@@ -34,16 +34,19 @@ class User < ApplicationRecord
   scope :kept, -> { where(discarded_at: nil) }
 
   def self.super_admin = kept.where(role: "super_admin").order(:id).first
+  def self.case_staff  = kept.where(role: %w[super_admin staff]).order(:id)
 
-  def super_admin? = role == "super_admin"
-  def student?     = role == "student"
+  def super_admin?  = role == "super_admin"
+  def staff?        = role == "staff"
+  def student?      = role == "student"
+  def case_staff?   = super_admin? || staff?
   def has_passport? = passport.present?
 
   def initials
     name.split.first(2).map { _1[0].upcase }.join.presence || email_address[0].upcase
   end
 
-  def otp_required? = super_admin? && otp_enabled_at.present?
+  def otp_required? = case_staff? && otp_enabled_at.present?
 
   # Verifies a TOTP code exactly once: the consumed timestep is remembered so a
   # sniffed code cannot be replayed within its 30-second window.

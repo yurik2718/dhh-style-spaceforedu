@@ -3,7 +3,7 @@ class Admin::HomologationRequestsController < ApplicationController
     @homologation_request = HomologationRequest.kept
                               .includes(:user, :conversation)
                               .find(params[:id])
-    authorize @homologation_request, :manage_pipeline?
+    authorize @homologation_request, :manage_case?
 
     ids = policy_scope(HomologationRequest).kept.order(updated_at: :desc).pluck(:id)
     idx = ids.index(@homologation_request.id) || 0

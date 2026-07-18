@@ -118,7 +118,7 @@
           <% end %>
         </header>
 
-        <% if hr.pipeline_stage && !hr.terminal? %>
+        <% if hr.pipeline_stage && !hr.terminal? && policy(hr).manage_pipeline? %>
           <div class="flex gap-2 justify-end" data-controller="dialog">
             <button type="button" data-action="dialog#open" class="btn btn-ghost btn-sm">
               ← <%= t("admin.requests.actions.retreat") %>
@@ -310,7 +310,7 @@
           </p>
         <% end %>
 
-        <% if hr.status == "awaiting_payment" %>
+        <% if hr.status == "awaiting_payment" && policy(hr).manage_pipeline? %>
           <%= button_to t("admin.requests.actions.confirm_payment"),
                 admin_homologation_request_payment_confirmation_path(hr),
                 method: :post,

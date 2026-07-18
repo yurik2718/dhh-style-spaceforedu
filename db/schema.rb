@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_114325) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_044015) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -199,7 +199,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_114325) do
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["google_uid"], name: "index_users_on_google_uid", unique: true
-    t.check_constraint "role IN ('super_admin', 'student')", name: "valid_role"
+    t.check_constraint "role IN ('super_admin', 'staff', 'student')", name: "valid_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

@@ -7,6 +7,13 @@ admin:
   role: super_admin
   country: ES
 
+staff_es:
+  email_address: staff@example.com
+  password_digest: <%= password_digest %>
+  name: Sofia
+  role: staff
+  country: ES
+
 student_es:
   email_address: anna@example.com
   password_digest: <%= password_digest %>

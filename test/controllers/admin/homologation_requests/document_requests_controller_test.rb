@@ -21,6 +21,16 @@ class Admin::HomologationRequests::DocumentRequestsControllerTest < ActionDispat
                  @hr.conversation.messages.order(:created_at).last.body
   end
 
+  test "POST create by staff flips status to awaiting_reply" do
+    sign_in_as users(:staff_es)
+
+    post admin_homologation_request_document_request_path(@hr),
+         params: { document_request: { reason: "Please send a clearer scan." } }
+
+    assert_redirected_to admin_homologation_request_path(@hr)
+    assert_equal "awaiting_reply", @hr.reload.status
+  end
+
   test "POST create without a reason redirects with an alert and leaves status unchanged" do
     sign_in_as @admin
 
